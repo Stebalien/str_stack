@@ -1,0 +1,5 @@
+[package]
+name = "str_stack"
+description = "a string allocator for allocating many write-once strings"
+version = "0.1.0"
+authors = ["Steven Allen <steven@stebalien.com>"]
