@@ -1,3 +1,21 @@
+//! A string allocation library. This is primarily useful when you want to allocate a bunch of
+//! small strings, use them, and then destroy them all together.
+//!
+//! ## Example
+//!
+//! ```
+//! use str_stack::StrStack;
+//!
+//! let mut stack = StrStack::new();
+//! let first = stack.push("one");
+//! let second = stack.push("two");
+//! let third = stack.push("three");
+//!
+//! assert_eq!(&stack[first], "one");
+//! assert_eq!(&stack[second], "two");
+//! assert_eq!(&stack[third], "three");
+//! ```
+//!
 use std::ops::Index;
 use std::fmt::{self, Write};
 use std::io::{self, Read};
