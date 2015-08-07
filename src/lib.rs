@@ -1,6 +1,6 @@
 use std::ops::Index;
-use std::fmt;
-use std::fmt::Write;
+use std::fmt::{self, Write};
+use std::io::{self, Read};
 
 #[derive(Clone)]
 pub struct StrStack {
@@ -110,6 +110,8 @@ impl StrStack {
     }
 
     /// Create a new StrStack with the given capacity.
+    ///
+    /// You will be able to push `bytes` bytes and create `strings` strings before reallocating.
     #[inline]
     pub fn with_capacity(bytes: usize, strings: usize) -> StrStack {
         StrStack {
@@ -118,6 +120,9 @@ impl StrStack {
         }
     }
 
+    /// Push a string onto the string stack.
+    ///
+    /// This returns the index of the string on the stack.
     #[inline]
     pub fn push(&mut self, s: &str) -> usize {
         self.data.push_str(s);
@@ -125,6 +130,7 @@ impl StrStack {
         self.len() - 1
     }
 
+    /// Iterate over the strings on the stack.
     #[inline]
     pub fn iter(&self) -> Iter {
         Iter {
@@ -134,6 +140,9 @@ impl StrStack {
         }
     }
 
+    /// Remove the top string from the stack.
+    ///
+    /// Returns true iff a string was removed.
     #[inline]
     pub fn pop(&mut self) -> bool {
         let popped = self.ends.pop().is_some();
@@ -143,28 +152,78 @@ impl StrStack {
         popped
     }
 
+    /// Clear the stack.
     #[inline]
     pub fn clear(&mut self) {
         self.ends.clear();
         self.data.clear();
     }
 
+    /// Returns the number of strings on the stack.
     #[inline]
     pub fn len(&self) -> usize {
         self.ends.len()
     }
 
+    /// Truncate the stack to `len` strings.
     #[inline]
     pub fn truncate(&mut self, len: usize) {
         self.ends.truncate(len);
         self.data.truncate(*self.ends.last().unwrap_or(&0));
     }
 
+    /// Read from `source` into the string stack.
+    ///
+    /// Returns the index of the new string or an IO Error.
+    pub fn consume<R: io::Read>(&mut self, mut source: R) -> io::Result<usize> {
+        match source.read_to_string(&mut self.data) {
+            Ok(_) => {
+                let idx = self.len();
+                self.ends.push(self.data.len());
+                Ok(idx)
+            },
+            Err(e) => Err(e),
+        }
+    }
+
+    /// Returns a writer helper for this string stack.
+    ///
+    /// This is useful for building a string in-place on the string-stack.
+    ///
+    /// Example:
+    ///
+    /// ```
+    /// use std::fmt::Write;
+    /// use str_stack::StrStack;
+    ///
+    /// let mut s = StrStack::new();
+    /// let index = {
+    ///     let mut writer = s.writer();
+    ///     writer.write_str("Hello");
+    ///     writer.write_char(' ');
+    ///     writer.write_str("World");
+    ///     writer.write_char('!');
+    ///     writer.finish()
+    /// };
+    /// assert_eq!(&s[index], "Hello World!");
+    /// ```
     #[inline]
     pub fn writer(&mut self) -> Writer {
         Writer(self)
     }
 
+    /// Allows calling the write! macro directly on the string stack:
+    ///
+    /// Example:
+    ///
+    /// ```
+    /// use std::fmt::Write;
+    /// use str_stack::StrStack;
+    ///
+    /// let mut s = StrStack::new();
+    /// let index = write!(&mut s, "Hello {}!", "World");
+    /// assert_eq!(&s[index], "Hello World!");
+    /// ```
     #[inline]
     pub fn write_fmt(&mut self, args: fmt::Arguments) -> usize {
         let mut writer = self.writer();
@@ -174,7 +233,9 @@ impl StrStack {
 }
 
 pub struct Writer<'a>(&'a mut StrStack);
+
 impl<'a> Writer<'a> {
+    /// Finish pushing the string onto the stack and return its index.
     #[inline]
     pub fn finish(self) -> usize {
         // We push on drop.
@@ -225,6 +286,13 @@ fn test_basic() {
 
     assert_eq!(stack.len(), 0);
     assert!(!stack.pop());
+}
+
+#[test]
+fn test_consume() {
+    let mut stack = StrStack::new();
+    let idx = stack.consume("testing".as_bytes()).unwrap();
+    assert_eq!(&stack[idx], "testing");
 }
 
 #[test]
