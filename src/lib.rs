@@ -2,7 +2,6 @@ use std::ops::Index;
 use std::fmt::{self, Write};
 use std::io::{self, Read};
 use std::iter::FromIterator;
-use std::{slice, mem};
 
 #[derive(Clone, Default)]
 pub struct StrStack {
@@ -237,8 +236,8 @@ impl StrStack {
         } else {
             *self.ends.get_unchecked(index-1)
         };
-        let end = self.ends.get_unchecked(index);
-        mem::transmute(slice::from_raw_parts(self.data.as_ptr().offset(start as isize), end-start))
+        let end = *self.ends.get_unchecked(index);
+        self.data.slice_unchecked(start, end)
     }
 }
 
