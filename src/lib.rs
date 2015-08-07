@@ -2,6 +2,7 @@ use std::ops::Index;
 use std::fmt::{self, Write};
 use std::io::{self, Read};
 use std::iter::FromIterator;
+use std::{slice, mem};
 
 #[derive(Clone)]
 pub struct StrStack {
@@ -13,13 +14,10 @@ impl Index<usize> for StrStack {
     type Output = str;
     #[inline]
     fn index(&self, index: usize) -> &str {
-        let start = if index == 0 {
-            0
-        } else {
-            self.ends[index-1]
-        };
-        let end = self.ends[index];
-        &self.data[start..end]
+        unsafe {
+            assert!(index < self.len(), "index out of bounds");
+            self.get_unchecked(index)
+        }
     }
 }
 
@@ -230,6 +228,17 @@ impl StrStack {
         let mut writer = self.writer();
         let _ = writer.write_fmt(args);
         writer.finish()
+    }
+
+    #[inline]
+    pub unsafe fn get_unchecked(&self, index: usize) -> &str {
+        let start = if index == 0 {
+            0
+        } else {
+            *self.ends.get_unchecked(index-1)
+        };
+        let end = self.ends.get_unchecked(index);
+        mem::transmute(slice::from_raw_parts(self.data.as_ptr().offset(start as isize), end-start))
     }
 }
 
