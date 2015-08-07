@@ -4,7 +4,7 @@ use std::io::{self, Read};
 use std::iter::FromIterator;
 use std::{slice, mem};
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct StrStack {
     data: String,
     ends: Vec<usize>,
