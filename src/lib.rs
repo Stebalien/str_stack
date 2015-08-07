@@ -1,6 +1,7 @@
 use std::ops::Index;
 use std::fmt::{self, Write};
 use std::io::{self, Read};
+use std::iter::FromIterator;
 
 #[derive(Clone)]
 pub struct StrStack {
@@ -232,6 +233,25 @@ impl StrStack {
     }
 }
 
+impl<S> Extend<S> for StrStack where S: AsRef<str> {
+    fn extend<T>(&mut self, iterator: T) where T: IntoIterator<Item=S> {
+        let iterator = iterator.into_iter();
+        let (min, _) = iterator.size_hint();
+        self.ends.reserve(min);
+        for v in iterator {
+            self.push(v.as_ref());
+        }
+    }
+}
+
+impl<S> FromIterator<S> for StrStack where S: AsRef<str> {
+    fn from_iter<T>(iterator: T) -> Self where T: IntoIterator<Item=S> {
+        let mut stack = StrStack::new();
+        stack.extend(iterator);
+        stack
+    }
+}
+
 pub struct Writer<'a>(&'a mut StrStack);
 
 impl<'a> Writer<'a> {
@@ -242,6 +262,7 @@ impl<'a> Writer<'a> {
         self.0.len()
     }
 }
+
 impl<'a> fmt::Write for Writer<'a> {
     #[inline]
     fn write_str(&mut self, s: &str) -> fmt::Result {
