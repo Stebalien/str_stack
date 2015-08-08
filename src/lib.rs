@@ -20,6 +20,7 @@ use std::ops::Index;
 use std::fmt::{self, Write};
 use std::io::{self, Read};
 use std::iter::FromIterator;
+use std::slice;
 
 #[derive(Clone, Default)]
 pub struct StrStack {
@@ -38,11 +39,10 @@ impl Index<usize> for StrStack {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Iter<'a> {
-    stack: &'a StrStack,
-    start: usize,
-    end: usize,
+    data: &'a str,
+    ends: &'a [usize],
 }
 
 impl fmt::Debug for StrStack {
@@ -55,30 +55,21 @@ impl<'a> Iterator for Iter<'a> {
     type Item = &'a str;
     #[inline]
     fn next(&mut self) -> Option<&'a str> {
-        if self.start == self.end {
-            None
-        } else {
-            let s = &self.stack[self.start];
-            self.start += 1;
-            Some(s)
+        unsafe {
+            let len = self.ends.len();
+            if len == 1 {
+                None
+            } else {
+                let start = *self.ends.get_unchecked(0);
+                let end = *self.ends.get_unchecked(1);
+                self.ends = slice::from_raw_parts(self.ends.as_ptr().offset(1), len - 1);
+                Some(self.data.slice_unchecked(start, end))
+            }
         }
     }
 
     fn count(self) -> usize {
-        self.end - self.start
-    }
-
-    fn nth(&mut self, n: usize) -> Option<&'a str> {
-        match self.start.checked_add(n) {
-            Some(n) if n < self.end => {
-                self.start = n;
-                self.next()
-            },
-            _ => {
-                self.start = self.end;
-                None
-            }
-        }
+        self.size_hint().0
     }
 
     fn last(mut self) -> Option<&'a str> {
@@ -87,7 +78,7 @@ impl<'a> Iterator for Iter<'a> {
 
     #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let len = self.end - self.start;
+        let len = self.ends.len() - 1;
         (len, Some(len))
     }
 }
@@ -97,11 +88,16 @@ impl<'a> ExactSizeIterator for Iter<'a> {}
 impl<'a> DoubleEndedIterator for Iter<'a> {
     #[inline]
     fn next_back(&mut self) -> Option<&'a str> {
-        if self.start == self.end {
-            None
-        } else {
-            self.end -= 1;
-            Some(&self.stack[self.end])
+        unsafe {
+            let len = self.ends.len();
+            if len == 1 {
+                None
+            } else {
+                let start = *self.ends.get_unchecked(len-2);
+                let end = *self.ends.get_unchecked(len-1);
+                self.ends = slice::from_raw_parts(self.ends.as_ptr(), len - 1);
+                Some(self.data.slice_unchecked(start, end))
+            }
         }
     }
 }
@@ -119,10 +115,7 @@ impl StrStack {
     /// Create a new StrStack.
     #[inline]
     pub fn new() -> StrStack {
-        StrStack {
-            data: String::new(),
-            ends: Vec::new(),
-        }
+        StrStack::with_capacity(0, 0)
     }
 
     /// Create a new StrStack with the given capacity.
@@ -130,10 +123,14 @@ impl StrStack {
     /// You will be able to push `bytes` bytes and create `strings` strings before reallocating.
     #[inline]
     pub fn with_capacity(bytes: usize, strings: usize) -> StrStack {
-        StrStack {
+        let mut stack = StrStack {
             data: String::with_capacity(bytes),
-            ends: Vec::with_capacity(strings)
-        }
+            ends: Vec::with_capacity(strings+1)
+        };
+        // Yes, I know I don't need this. However, putting this here avoids checks later which
+        // makes this much faster.
+        stack.ends.push(0);
+        stack
     }
 
     /// Push a string onto the string stack.
@@ -150,9 +147,8 @@ impl StrStack {
     #[inline]
     pub fn iter(&self) -> Iter {
         Iter {
-            stack: self,
-            start: 0,
-            end: self.len(),
+            data: &self.data,
+            ends: &self.ends,
         }
     }
 
@@ -161,31 +157,33 @@ impl StrStack {
     /// Returns true iff a string was removed.
     #[inline]
     pub fn pop(&mut self) -> bool {
-        let popped = self.ends.pop().is_some();
-        if let Some(&offset) = self.ends.last() {
-            self.data.truncate(offset);
+        if self.ends.len() <= 1 {
+            false
+        } else {
+            self.ends.pop();
+            self.data.truncate(*self.ends.last().unwrap());
+            true
         }
-        popped
     }
 
     /// Clear the stack.
     #[inline]
     pub fn clear(&mut self) {
-        self.ends.clear();
+        self.ends.truncate(1);
         self.data.clear();
     }
 
     /// Returns the number of strings on the stack.
     #[inline]
     pub fn len(&self) -> usize {
-        self.ends.len()
+        self.ends.len() - 1
     }
 
     /// Truncate the stack to `len` strings.
     #[inline]
     pub fn truncate(&mut self, len: usize) {
-        self.ends.truncate(len);
-        self.data.truncate(*self.ends.last().unwrap_or(&0));
+        self.ends.truncate(len.saturating_add(1));
+        self.data.truncate(*self.ends.last().unwrap());
     }
 
     /// Read from `source` into the string stack.
@@ -194,9 +192,8 @@ impl StrStack {
     pub fn consume<R: io::Read>(&mut self, mut source: R) -> io::Result<usize> {
         match source.read_to_string(&mut self.data) {
             Ok(_) => {
-                let idx = self.len();
                 self.ends.push(self.data.len());
-                Ok(idx)
+                Ok(self.len() - 1)
             },
             Err(e) => Err(e),
         }
@@ -249,12 +246,8 @@ impl StrStack {
 
     #[inline]
     pub unsafe fn get_unchecked(&self, index: usize) -> &str {
-        let start = if index == 0 {
-            0
-        } else {
-            *self.ends.get_unchecked(index-1)
-        };
-        let end = *self.ends.get_unchecked(index);
+        let start = *self.ends.get_unchecked(index);
+        let end = *self.ends.get_unchecked(index+1);
         self.data.slice_unchecked(start, end)
     }
 }
@@ -360,4 +353,18 @@ fn test_writer() {
     };
     assert_eq!(&stack[first], "first second");
     assert_eq!(&stack[second], "third fourth");
+}
+
+#[test]
+fn test_iter() {
+    let mut stack = StrStack::new();
+    stack.push("one");
+    stack.push("two");
+    stack.push("three");
+
+    let v1: Vec<_> = stack.iter().collect();
+    let v2: Vec<_> = stack.iter().rev().collect();
+
+    assert_eq!(&v1[..], &["one", "two", "three"]);
+    assert_eq!(&v2[..], &["three", "two", "one"]);
 }
