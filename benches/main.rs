@@ -3,7 +3,6 @@ extern crate test;
 extern crate str_stack;
 
 use str_stack::StrStack;
-use std::fmt::Write;
 
 #[bench]
 fn bench_index(b: &mut test::Bencher) {

@@ -18,7 +18,7 @@
 //!
 use std::ops::Index;
 use std::fmt::{self, Write};
-use std::io::{self, Read};
+use std::io;
 use std::iter::FromIterator;
 use std::slice;
 
@@ -177,6 +177,12 @@ impl StrStack {
     #[inline]
     pub fn len(&self) -> usize {
         self.ends.len() - 1
+    }
+
+    /// Returns true if there are no strings on the stack.
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.ends.len() == 1
     }
 
     /// Truncate the stack to `len` strings.
