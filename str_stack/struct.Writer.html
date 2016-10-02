@@ -9,7 +9,9 @@
 
     <title>str_stack::Writer - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -42,17 +44,24 @@
 
     <section id='main' class="content struct">
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>str_stack</a>::<wbr><a class='struct' href=''>Writer</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-122' class='srclink' href='../src/str_stack/lib.rs.html#274' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct Writer&lt;'a&gt;(_);</pre><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'a&gt; <a class='struct' href='../str_stack/struct.Writer.html' title='str_stack::Writer'>Writer</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.finish' class='method'><code>fn <a href='#method.finish' class='fnname'>finish</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-101' class='srclink' href='../src/str_stack/src/lib.rs.html#280' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Writer&lt;'a&gt;(_);</pre><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='struct' href='../str_stack/struct.Writer.html' title='str_stack::Writer'>Writer</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-105' class='srclink' href='../src/str_stack/src/lib.rs.html#282-289' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.finish' class='method'><span id='finish.v' class='invisible'><code>fn <a href='#method.finish' class='fnname'>finish</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></span></h4>
 <div class='docblock'><p>Finish pushing the string onto the stack and return its index.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Write.html' title='core::fmt::Write'>Write</a> for <a class='struct' href='../str_stack/struct.Writer.html' title='str_stack::Writer'>Writer</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.write_str' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Write.html#method.write_str' class='fnname'>write_str</a>(&amp;mut self, s: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
-<h4 id='method.write_char' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Write.html#method.write_char' class='fnname'>write_char</a>(&amp;mut self, c: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.char.html'>char</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
-<h4 id='method.write_fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Write.html#method.write_fmt' class='fnname'>write_fmt</a>(&amp;mut self, args: <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Arguments.html' title='core::fmt::Arguments'>Arguments</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Error.html' title='core::fmt::Error'>Error</a>&gt;</code></h4>
-</div><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../str_stack/struct.Writer.html' title='str_stack::Writer'>Writer</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
-</div></section>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Write.html' title='core::fmt::Write'>Write</a> for <a class='struct' href='../str_stack/struct.Writer.html' title='str_stack::Writer'>Writer</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-109' class='srclink' href='../src/str_stack/src/lib.rs.html#291-302' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.write_str' class='method'><span id='write_str.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Write.html#tymethod.write_str' class='fnname'>write_str</a>(&amp;mut self, s: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
+<div class='docblock'><p>Writes a slice of bytes into this writer, returning whether the write succeeded. <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Write.html#tymethod.write_str">Read more</a></p>
+</div><h4 id='method.write_char' class='method'><span id='write_char.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Write.html#method.write_char' class='fnname'>write_char</a>(&amp;mut self, c: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.char.html'>char</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
+<div class='docblock'><p>Writes a <code>char</code> into this writer, returning whether the write succeeded. <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Write.html#method.write_char">Read more</a></p>
+</div><h4 id='method.write_fmt' class='method'><span id='write_fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Write.html#method.write_fmt' class='fnname'>write_fmt</a>(&amp;mut self, args: <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Arguments.html' title='core::fmt::Arguments'>Arguments</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>,&nbsp;<a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Error.html' title='core::fmt::Error'>Error</a>&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+<div class='docblock'><p>Glue for usage of the <code>write!</code> macro with implementors of this trait. <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Write.html#method.write_fmt">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../str_stack/struct.Writer.html' title='str_stack::Writer'>Writer</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-117' class='srclink' href='../src/str_stack/src/lib.rs.html#304-308' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.drop' class='method'><span id='drop.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></span></h4>
+<div class='docblock'><p>A method called when the value goes out of scope. <a href="https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop">Read more</a></p>
+</div></div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -75,6 +84,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 
@@ -95,7 +106,7 @@
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>
@@ -111,6 +122,6 @@
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>
