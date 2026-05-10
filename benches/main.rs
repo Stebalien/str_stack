@@ -1,6 +1,6 @@
 #![feature(test)]
-extern crate test;
 extern crate str_stack;
+extern crate test;
 
 use str_stack::StrStack;
 
@@ -56,7 +56,6 @@ fn bench_iter_naive(b: &mut test::Bencher) {
 
 #[bench]
 fn bench_alloc(b: &mut test::Bencher) {
-
     b.iter(|| {
         let mut stack = StrStack::new();
         for i in 0..1000 {
@@ -68,7 +67,6 @@ fn bench_alloc(b: &mut test::Bencher) {
 
 #[bench]
 fn bench_alloc_naive(b: &mut test::Bencher) {
-
     b.iter(|| {
         let stack: Vec<_> = (0..1000).map(|i| test::black_box(i).to_string()).collect();
         test::black_box(stack);

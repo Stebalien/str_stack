@@ -16,10 +16,10 @@
 //! assert_eq!(&stack[third], "three");
 //! ```
 //!
-use std::ops::Index;
 use std::fmt::{self, Write};
 use std::io;
 use std::iter::FromIterator;
+use std::ops::Index;
 use std::slice;
 
 #[derive(Clone, Default)]
@@ -93,8 +93,8 @@ impl<'a> DoubleEndedIterator for Iter<'a> {
             if len == 1 {
                 None
             } else {
-                let start = *self.ends.get_unchecked(len-2);
-                let end = *self.ends.get_unchecked(len-1);
+                let start = *self.ends.get_unchecked(len - 2);
+                let end = *self.ends.get_unchecked(len - 1);
                 self.ends = slice::from_raw_parts(self.ends.as_ptr(), len - 1);
                 Some(self.data.slice_unchecked(start, end))
             }
@@ -125,7 +125,7 @@ impl StrStack {
     pub fn with_capacity(bytes: usize, strings: usize) -> StrStack {
         let mut stack = StrStack {
             data: String::with_capacity(bytes),
-            ends: Vec::with_capacity(strings+1)
+            ends: Vec::with_capacity(strings + 1),
         };
         // Yes, I know I don't need this. However, putting this here avoids checks later which
         // makes this much faster.
@@ -200,7 +200,7 @@ impl StrStack {
             Ok(_) => {
                 self.ends.push(self.data.len());
                 Ok(self.len() - 1)
-            },
+            }
             Err(e) => Err(e),
         }
     }
@@ -253,13 +253,19 @@ impl StrStack {
     #[inline]
     pub unsafe fn get_unchecked(&self, index: usize) -> &str {
         let start = *self.ends.get_unchecked(index);
-        let end = *self.ends.get_unchecked(index+1);
+        let end = *self.ends.get_unchecked(index + 1);
         self.data.slice_unchecked(start, end)
     }
 }
 
-impl<S> Extend<S> for StrStack where S: AsRef<str> {
-    fn extend<T>(&mut self, iterator: T) where T: IntoIterator<Item=S> {
+impl<S> Extend<S> for StrStack
+where
+    S: AsRef<str>,
+{
+    fn extend<T>(&mut self, iterator: T)
+    where
+        T: IntoIterator<Item = S>,
+    {
         let iterator = iterator.into_iter();
         let (min, _) = iterator.size_hint();
         self.ends.reserve(min);
@@ -269,8 +275,14 @@ impl<S> Extend<S> for StrStack where S: AsRef<str> {
     }
 }
 
-impl<S> FromIterator<S> for StrStack where S: AsRef<str> {
-    fn from_iter<T>(iterator: T) -> Self where T: IntoIterator<Item=S> {
+impl<S> FromIterator<S> for StrStack
+where
+    S: AsRef<str>,
+{
+    fn from_iter<T>(iterator: T) -> Self
+    where
+        T: IntoIterator<Item = S>,
+    {
         let mut stack = StrStack::new();
         stack.extend(iterator);
         stack
