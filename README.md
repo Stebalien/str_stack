@@ -7,7 +7,7 @@ a bunch of small strings, use them, and then destroy them all together.
 Documentation
 -------------
 
-https://stebalien.github.com/str_stack/str_stack/
+https://docs.rs/str_stack/latest/str_stack/
 
 Performance
 -----------
