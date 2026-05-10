@@ -22,10 +22,16 @@ use std::iter::FromIterator;
 use std::ops::Index;
 use std::slice;
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct StrStack {
     data: String,
     ends: Vec<usize>,
+}
+
+impl Default for StrStack {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Index<usize> for StrStack {
@@ -321,29 +327,30 @@ impl<'a> Drop for Writer<'a> {
 
 #[test]
 fn test_basic() {
-    let mut stack = StrStack::new();
-    let first = stack.push("one");
-    let second = stack.push("two");
-    let third = stack.push("three");
+    for mut stack in [StrStack::new(), StrStack::default()] {
+        let first = stack.push("one");
+        let second = stack.push("two");
+        let third = stack.push("three");
 
-    assert_eq!(&stack[first], "one");
-    assert_eq!(&stack[second], "two");
-    assert_eq!(&stack[third], "three");
+        assert_eq!(&stack[first], "one");
+        assert_eq!(&stack[second], "two");
+        assert_eq!(&stack[third], "three");
 
-    assert_eq!(stack.len(), 3);
+        assert_eq!(stack.len(), 3);
 
-    assert!(stack.pop());
+        assert!(stack.pop());
 
-    assert_eq!(stack.len(), 2);
+        assert_eq!(stack.len(), 2);
 
-    assert_eq!(&stack[first], "one");
-    assert_eq!(&stack[second], "two");
+        assert_eq!(&stack[first], "one");
+        assert_eq!(&stack[second], "two");
 
-    assert!(stack.pop());
-    assert!(stack.pop());
+        assert!(stack.pop());
+        assert!(stack.pop());
 
-    assert_eq!(stack.len(), 0);
-    assert!(!stack.pop());
+        assert_eq!(stack.len(), 0);
+        assert!(!stack.pop());
+    }
 }
 
 #[test]
