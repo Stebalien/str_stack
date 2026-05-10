@@ -69,7 +69,7 @@ impl<'a> Iterator for Iter<'a> {
                 let start = *self.ends.get_unchecked(0);
                 let end = *self.ends.get_unchecked(1);
                 self.ends = slice::from_raw_parts(self.ends.as_ptr().offset(1), len - 1);
-                Some(self.data.slice_unchecked(start, end))
+                Some(self.data.get_unchecked(start..end))
             }
         }
     }
@@ -102,7 +102,7 @@ impl<'a> DoubleEndedIterator for Iter<'a> {
                 let start = *self.ends.get_unchecked(len - 2);
                 let end = *self.ends.get_unchecked(len - 1);
                 self.ends = slice::from_raw_parts(self.ends.as_ptr(), len - 1);
-                Some(self.data.slice_unchecked(start, end))
+                Some(self.data.get_unchecked(start..end))
             }
         }
     }
@@ -151,7 +151,7 @@ impl StrStack {
 
     /// Iterate over the strings on the stack.
     #[inline]
-    pub fn iter(&self) -> Iter {
+    pub fn iter(&self) -> Iter<'_> {
         Iter {
             data: &self.data,
             ends: &self.ends,
@@ -233,7 +233,7 @@ impl StrStack {
     /// assert_eq!(&s[index], "Hello World!");
     /// ```
     #[inline]
-    pub fn writer(&mut self) -> Writer {
+    pub fn writer(&mut self) -> Writer<'_> {
         Writer(self)
     }
 
@@ -256,11 +256,31 @@ impl StrStack {
         writer.finish()
     }
 
+    /// Returns a reference to the string at the given index, without performing bounds checking.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that `index < self.len()`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use str_stack::StrStack;
+    ///
+    /// let mut stack = StrStack::new();
+    /// stack.push("one");
+    /// stack.push("two");
+    ///
+    /// unsafe {
+    ///     assert_eq!(stack.get_unchecked(0), "one");
+    ///     assert_eq!(stack.get_unchecked(1), "two");
+    /// }
+    /// ```
     #[inline]
     pub unsafe fn get_unchecked(&self, index: usize) -> &str {
         let start = *self.ends.get_unchecked(index);
         let end = *self.ends.get_unchecked(index + 1);
-        self.data.slice_unchecked(start, end)
+        self.data.get_unchecked(start..end)
     }
 }
 

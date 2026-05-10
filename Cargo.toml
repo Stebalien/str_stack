@@ -1,5 +1,6 @@
 [package]
 name = "str_stack"
+edition = "2015"
 description = """A string allocator for allocating many write-once strings.
 
 This library is primarily useful for parsing where you need to repeatedly build
